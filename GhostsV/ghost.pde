@@ -14,17 +14,13 @@ class ghost {
   color c;
   float t_xwalk = 0; // for movement
   float t_ywalk = 0; // for movement
-  float immuneProb = 0.0;
 
-  ghost (float xpos, float ypos, float sze) {
+  ghost (float xpos, float ypos, float sze, float immuneProb) {
     x = xpos;
     y = ypos;
     w = sze;
     h = w * 7 /8;
     d = random(0, TWO_PI);
-    if (random(0,1)<immuneProb) {
-      status = "immune";
-    }
     if (name_i == 0) {
       name = "blinky";
       c = color(255, 0, 0);
@@ -40,6 +36,12 @@ class ghost {
     } else {
       c = color(120, 120, 120);
     }
+    
+    if (random(0,1)<immuneProb) {
+      status = "immune";
+      c = color (200,0,200);
+    }
+    
   }
 
   void display() {
@@ -102,7 +104,7 @@ class ghost {
   }
   
   void immune(){
-    drawBody(color(255/2));
+    drawBody(c);
     drawEyes();
   }
 

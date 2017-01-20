@@ -13,7 +13,7 @@
 int canvasX = 600; //size of the canvas
 int canvasY = 600; //size of the canvas
 float canvasC = 255/2; //color of the canvas
-int nGhosts = 200; //number of ghosts
+int nGhosts = 2; //number of ghosts
 float zombifyProb = 0.1; //probability per frame to go from infected to zombie
 float infectionProb = 0.2; //probability per frame for zombie to bite nearby ghosts
 Table nCounts = new Table(); //table to save data
@@ -22,7 +22,9 @@ int nS = 0; //count of susceptible subjects (updates every frame)
 int nI = 0; //count of infected subjects (updates every frame)
 int nZ = 0; //count of zombie subjects (updates every frame)
 
+String tstamp;
 
+//tstamp = tstamp + nf(month(),2);
 
 ghost[] g = new ghost[nGhosts];
 int[] initialX = new int[nGhosts];
@@ -30,7 +32,15 @@ int[] initialY = new int[nGhosts];
 
 // SETUP happens once (Processing default)
 void setup() {
+  tstamp = nf(year(),4);
+  tstamp = tstamp + '_' + nf(month(),2);
+  tstamp = tstamp + '_' + nf(day(),2);
+  tstamp = tstamp + '_' + nf(hour(),2);
+  tstamp = tstamp + '_' + nf(minute(),2);
+  tstamp = tstamp + '_' + nf(second(),2);
+  println(tstamp);
   size(600, 600, P2D);
+  //size(600, 600, P2D);
   ellipseMode(CENTER);
   rectMode(CENTER);
   background(canvasC);
@@ -46,6 +56,8 @@ void setup() {
   nCounts.addColumn("nI");
   nCounts.addColumn("nZ");
   nCounts.addColumn("nT");
+  nCounts.addColumn("pZ");
+  nCounts.addColumn("pI");
 }
 
 // DRAW happens every frame (Processing default)
@@ -85,6 +97,9 @@ void draw() {
   newRow.setInt("nI", nI);
   newRow.setInt("nZ", nZ);
   newRow.setInt("nT", nGhosts);
+  newRow.setFloat("pZ", zombifyProb);
+  newRow.setFloat("pI", infectionProb);
   
-  saveTable(nCounts, "data/nCounts.csv");
+  //saveTable(nCounts, "data/nCounts.csv");
+  saveTable(nCounts, "data/"+tstamp+".csv");
 }

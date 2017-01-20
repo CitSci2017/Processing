@@ -8,21 +8,26 @@
 //    Mouse clicking a subject infects it
 //    Infected subjects have chance to become zombies
 //    Zombies infect nearby subjects
+//    Immune ghosts can't get infected
 
 // Simulation parameters
 int canvasX = 600; //size of the canvas
 int canvasY = 600; //size of the canvas
 float canvasC = 255/2; //color of the canvas
-int nGhosts = 200; //number of ghosts
+int nGhosts = 20; //number of ghosts
 float zombifyProb = 0.1; //probability per frame to go from infected to zombie
 float infectionProb = 0.2; //probability per frame for zombie to bite nearby ghosts
+float immuneProb = 0.5;
 Table nCounts = new Table(); //table to save data
 int nFrame = 0; //time axis (in units of frames)
 int nS = 0; //count of susceptible subjects (updates every frame)
 int nI = 0; //count of infected subjects (updates every frame)
 int nZ = 0; //count of zombie subjects (updates every frame)
+int nV = 0; //count of immune/vaccinated subjects (updates every frame)
 
+String tstamp;
 
+//tstamp = tstamp + nf(month(),2);
 
 ghost[] g = new ghost[nGhosts];
 int[] initialX = new int[nGhosts];
@@ -30,7 +35,15 @@ int[] initialY = new int[nGhosts];
 
 // SETUP happens once (Processing default)
 void setup() {
+  tstamp = nf(year(),4);
+  tstamp = tstamp + '_' + nf(month(),2);
+  tstamp = tstamp + '_' + nf(day(),2);
+  tstamp = tstamp + '_' + nf(hour(),2);
+  tstamp = tstamp + '_' + nf(minute(),2);
+  tstamp = tstamp + '_' + nf(second(),2);
+  println(tstamp);
   size(600, 600, P2D);
+  //size(600, 600, P2D);
   ellipseMode(CENTER);
   rectMode(CENTER);
   background(canvasC);
@@ -39,13 +52,16 @@ void setup() {
   for (int i=0; i<nGhosts; i++) {
     initialX[i] = int(random(0, canvasX));
     initialY[i] = int(random(0, canvasY));
-    g[i] = new ghost(initialX[i], initialY[i], 35);
+    g[i] = new ghost(initialX[i], initialY[i], 35, immuneProb);
   }
   nCounts.addColumn("nFrame");
   nCounts.addColumn("nS");
   nCounts.addColumn("nI");
   nCounts.addColumn("nZ");
   nCounts.addColumn("nT");
+  nCounts.addColumn("nV");
+  nCounts.addColumn("pZ");
+  nCounts.addColumn("pI");
 }
 
 // DRAW happens every frame (Processing default)
@@ -69,6 +85,7 @@ void draw() {
   nS = 0;
   nI = 0;
   nZ = 0;
+  nV = 0;
   for (int i=0; i<nGhosts; i++) {
     g[i].display();
     if (g[i].status=="susceptible" || g[i].status=="marked") {
@@ -77,6 +94,8 @@ void draw() {
       nI = nI + 1;
     } else if (g[i].status=="zombie") {
       nZ = nZ + 1;
+    } else if (g[i].status=="immune") {
+      nV = nV +1;
     }
   }
   TableRow newRow = nCounts.addRow();
@@ -84,7 +103,11 @@ void draw() {
   newRow.setInt("nS", nS);
   newRow.setInt("nI", nI);
   newRow.setInt("nZ", nZ);
+  newRow.setInt("nV", nV);
   newRow.setInt("nT", nGhosts);
+  newRow.setFloat("pZ", zombifyProb);
+  newRow.setFloat("pI", infectionProb);
   
   saveTable(nCounts, "data/nCounts.csv");
+  //saveTable(nCounts, "data/"+tstamp+".csv");
 }
